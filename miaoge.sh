@@ -121,17 +121,19 @@ function lnmp_setup() {
     clear
     echo "LDNMP一键建站系统"
     echo "1. 安装 LNMP 环境"
-    echo "2. 配置多站点支持"
-    echo "3. 网站优化与防护"
-    echo "4. 备份与恢复"
-    echo "5. 返回主菜单"
+    echo "2. 卸载 LNMP 环境"
+    echo "3. 配置多站点支持"
+    echo "4. 网站优化与防护"
+    echo "5. 备份与恢复"
+    echo "0. 返回主菜单"
     read -p "请选择操作: " lnmp_choice
     case $lnmp_choice in
         1) install_lnmp ;;
-        2) configure_multisite ;;
-        3) website_optimization ;;
-        4) backup_restore ;;
-        5) show_menu ;;
+        2) Uninstall LNMP ;;
+        3) configure_multisite ;;
+        4）website_optimization ;;
+        5) backup_restore ;;
+        0) show_menu ;;
         *) echo "无效选择，请重新输入。" && lnmp_setup ;;
     esac
 }
@@ -154,6 +156,70 @@ function install_lnmp() {
     echo "LNMP 环境安装完成！"
     read -p "按Enter返回LDNMP菜单..." && lnmp_setup
 }
+
+# 提示用户确认操作
+read -p "该操作将卸载 LNMP 环境，删除相关服务和配置文件，确认继续 (y/n)? " confirm
+if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "操作已取消"
+    exit 0
+fi
+
+echo "开始卸载 LNMP 环境..."
+
+# 2. 停止并删除 Nginx
+echo "停止并卸载 Nginx ..."
+systemctl stop nginx
+systemctl disable nginx
+rm -rf /etc/nginx
+rm -rf /usr/share/nginx
+rm -rf /var/log/nginx
+rm -rf /var/www/html
+rm -rf /etc/systemd/system/nginx.service
+apt-get remove --purge nginx nginx-common nginx-full -y
+apt-get autoremove -y
+
+# 3. 停止并删除 MySQL
+echo "停止并卸载 MySQL ..."
+systemctl stop mysql
+systemctl disable mysql
+rm -rf /etc/mysql
+rm -rf /var/lib/mysql
+rm -rf /var/log/mysql
+rm -rf /etc/systemd/system/mysql.service
+apt-get remove --purge mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-* -y
+apt-get autoremove -y
+
+# 4. 停止并删除 PHP
+echo "停止并卸载 PHP ..."
+systemctl stop php7.4-fpm  # 根据安装的 PHP 版本调整（如 php7.4-fpm）
+systemctl disable php7.4-fpm
+rm -rf /etc/php
+rm -rf /usr/share/php
+rm -rf /var/log/php*
+rm -rf /etc/systemd/system/php7.4-fpm.service  # 根据安装的 PHP 版本调整
+apt-get remove --purge php* -y
+apt-get autoremove -y
+
+# 5. 删除 LNMP 环境相关的依赖包
+echo "删除 LNMP 环境相关的依赖包 ..."
+apt-get remove --purge libnginx-mod-http-image-filter libnginx-mod-http-xslt-filter libnginx-mod-mail libnginx-mod-stream -y
+apt-get remove --purge mysql-common mysql-client-core-* mysql-server-core-* -y
+apt-get autoremove -y
+
+# 6. 清理缓存
+echo "清理 apt 缓存 ..."
+apt-get clean
+apt-get autoclean
+
+# 7. 删除残留的文件
+echo "删除残留的文件和目录 ..."
+rm -rf /etc/nginx /var/www/html /var/lib/mysql /var/log/nginx /var/log/mysql
+
+# 完成
+echo "LNMP 环境卸载完成。"
+
+# 提示用户重启服务器
+echo "为了确保所有服务被完全卸载，请重启服务器：sudo reboot"
 
 # 配置多站点支持
 function configure_multisite() {
