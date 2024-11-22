@@ -24,4 +24,4 @@
 1. **下载脚本**
    克隆仓库或下载 `miaoge.sh` 脚本文件：
    ```bash
-   git clone https://github.com/username/vps-toolbox.git
+   git clone https://github.com/zhang20245/miaogegjuxiang.git
