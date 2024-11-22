@@ -2,20 +2,22 @@ MIT License
 
 Copyright (c) 2024 ZHANGCHAOHUA
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+#### 解释：
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+1. **项目简介**：简要介绍脚本的主要功能。
+2. **功能列表**：列出脚本提供的所有功能。
+3. **使用说明**：解释如何下载、运行脚本以及每个功能的使用方式。
+4. **许可证**：项目使用的开源许可证，通常是 MIT 许可证。
+
+### 步骤 5：更新和维护
+
+以后如果对脚本进行修改或者优化，您可以：
+
+1. 修改本地的脚本文件。
+2. 使用 `git add` 和 `git commit` 提交更改。
+3. 使用 `git push` 将修改推送到 GitHub。
+
+### 总结
+
+通过以上步骤，您成功将脚本上传到 GitHub，并且在 `README.md` 文件中详细描述了脚本的功能和使用方法，其他人可以通过 GitHub 下载并使用您的脚本。这样，您就可以与其他开发者或用户共享您的工具了，帮助他们更高效地管理 VPS。
