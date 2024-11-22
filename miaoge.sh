@@ -3,21 +3,6 @@
 # 喵哥的 VPS 管理工具箱 - 扩展版
 # 新增功能：设置快捷键、修改密码、系统优化、防火墙、内核管理等
 
-# 定义颜色
-GREEN="\033[0;32m"
-RED="\033[0;31m"
-YELLOW="\033[0;33m"
-BLUE="\033[0;34m"
-RESET="\033[0m"
-
-# 日志文件
-LOG_FILE="/var/log/vps_toolbox.log"
-
-# 输出日志
-log_message() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> $LOG_FILE
-}
-
 # 输出欢迎信息
 welcome_message() {
     echo -e "${GREEN}欢迎使用喵哥的 VPS 管理工具箱！${RESET}"
