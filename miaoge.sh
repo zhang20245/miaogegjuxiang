@@ -9,6 +9,275 @@ SCRIPT_NAME="喵哥的Shell脚本工具"
 echo "欢迎使用 $SCRIPT_NAME V$VERSION"
 echo "此工具包括Docker管理器和LDNMP建站系统，支持快速搭建和管理站点。"
 
+# 脚本菜单
+show_menu() {
+    echo "==============================="
+    echo "系统工具脚本"
+    echo "==============================="
+    echo "1. 设置脚本启动快捷键"
+    echo "2. 修改登录密码"
+    echo "3. ROOT密码登录模式"
+    echo "4. 安装Python指定版本"
+    echo "5. 开放所有端口"
+    echo "6. 修改SSH连接端口"
+    echo "7. 优化DNS地址"
+    echo "8. 一键重装系统"
+    echo "9. 禁用ROOT账户创建新账户"
+    echo "10. 切换优先IPv4/IPv6"
+    echo "------------------------------"
+    echo "11. 查看端口占用状态"
+    echo "12. 修改虚拟内存大小"
+    echo "13. 用户管理"
+    echo "14. 用户/密码生成器"
+    echo "15. 系统时区调整"
+    echo "16. 设置BBR3加速"
+    echo "17. 防火墙高级管理器"
+    echo "18. 修改主机名"
+    echo "19. 切换系统更新源"
+    echo "==============================="
+}
+
+# 1. 设置脚本启动快捷键
+set_shortcut() {
+    echo "请输入快捷键，例如Ctrl+Alt+T："
+    read shortcut
+    # 修改快捷键，假设为 GNOME 环境
+    gnome-keybinding-properties --add 'run-script' --command "/path/to/script.sh"
+    echo "已设置快捷键 $shortcut 启动脚本"
+}
+
+# 2. 修改登录密码
+change_password() {
+    echo "请输入新密码："
+    read -s new_password
+    echo "请输入确认密码："
+    read -s confirm_password
+    if [ "$new_password" == "$confirm_password" ]; then
+        echo "当前用户的密码已更改"
+        echo "$USER:$new_password" | chpasswd
+    else
+        echo "两次输入密码不一致！"
+    fi
+}
+
+# 3. ROOT密码登录模式
+root_login() {
+    echo "请输入ROOT用户密码："
+    sudo passwd root
+}
+
+# 4. 安装Python指定版本
+install_python_version() {
+    echo "请输入要安装的Python版本："
+    read version
+    sudo apt update
+    sudo apt install -y python$version
+    sudo update-alternatives --install /usr/bin/python python /usr/bin/python$version 1
+}
+
+# 5. 开放所有端口
+open_all_ports() {
+    sudo ufw allow from any to any port 1:65535 proto tcp
+    sudo ufw reload
+    echo "已开放所有端口"
+}
+
+# 6. 修改SSH连接端口
+change_ssh_port() {
+    echo "请输入新的SSH端口："
+    read port
+    sudo sed -i "s/Port 22/Port $port/" /etc/ssh/sshd_config
+    sudo systemctl restart sshd
+    echo "SSH端口已更改为 $port"
+}
+
+# 7. 优化DNS地址
+optimize_dns() {
+    echo "请输入首选DNS地址："
+    read dns1
+    echo "请输入备选DNS地址："
+    read dns2
+    echo -e "nameserver $dns1\nnameserver $dns2" | sudo tee /etc/resolv.conf > /dev/null
+    echo "DNS已优化"
+}
+
+# 8. 一键重装系统 ★
+reinstall_system() {
+    echo "警告：这将重装系统，所有数据将丢失！"
+    echo "是否继续？(yes/no)"
+    read confirm
+    if [ "$confirm" == "yes" ]; then
+        sudo apt-get install --reinstall ubuntu-desktop
+        sudo reboot
+    else
+        echo "操作已取消"
+    fi
+}
+
+# 9. 禁用ROOT账户创建新账户
+disable_root_account() {
+    sudo usermod -L root
+    echo "ROOT账户已禁用创建新账户"
+}
+
+# 10. 切换优先IPv4/IPv6
+switch_ip_protocol() {
+    echo "请选择优先协议（1为IPv4，2为IPv6）："
+    read choice
+    if [ "$choice" == "1" ]; then
+        sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+        sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+        echo "已切换优先IPv4"
+    elif [ "$choice" == "2" ]; then
+        sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
+        sudo sysctl -w net.ipv6.conf.default.disable_ipv6=0
+        echo "已切换优先IPv6"
+    else
+        echo "无效选择"
+    fi
+}
+
+# 11. 查看端口占用状态
+check_ports() {
+    sudo netstat -tuln
+}
+
+# 12. 修改虚拟内存大小
+modify_swap_size() {
+    echo "请输入新的虚拟内存大小 (例如: 4G):"
+    read swap_size
+    sudo fallocate -l $swap_size /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+    echo "虚拟内存已更改为 $swap_size"
+}
+
+# 13. 用户管理
+user_management() {
+    echo "请选择操作："
+    echo "1. 添加用户"
+    echo "2. 删除用户"
+    echo "3. 修改用户信息"
+    read action
+    case $action in
+        1)
+            echo "请输入用户名："
+            read username
+            sudo adduser $username
+            ;;
+        2)
+            echo "请输入要删除的用户名："
+            read username
+            sudo deluser $username
+            ;;
+        3)
+            echo "请输入要修改的用户名："
+            read username
+            sudo chfn $username
+            ;;
+        *)
+            echo "无效操作"
+            ;;
+    esac
+}
+
+# 14. 用户/密码生成器
+generate_user_pass() {
+    echo "请输入用户名："
+    read username
+    echo "请输入密码长度："
+    read length
+    password=$(openssl rand -base64 $length)
+    echo "用户名: $username"
+    echo "密码: $password"
+}
+
+# 15. 系统时区调整
+adjust_timezone() {
+    echo "请输入时区 (例如: Asia/Shanghai)："
+    read timezone
+    sudo timedatectl set-timezone $timezone
+    echo "时区已设置为 $timezone"
+}
+
+# 16. 设置BBR3加速
+set_bbr3() {
+    sudo sysctl -w net.ipv4.tcp_congestion_control=bbr
+    echo "BBR3加速已启用"
+}
+
+# 17. 防火墙高级管理器
+firewall_manager() {
+    echo "请输入操作："
+    echo "1. 查看防火墙状态"
+    echo "2. 开放端口"
+    echo "3. 关闭端口"
+    read action
+    case $action in
+        1)
+            sudo ufw status
+            ;;
+        2)
+            echo "请输入要开放的端口："
+            read port
+            sudo ufw allow $port
+            ;;
+        3)
+            echo "请输入要关闭的端口："
+            read port
+            sudo ufw deny $port
+            ;;
+        *)
+            echo "无效操作"
+            ;;
+    esac
+}
+
+# 18. 修改主机名
+change_hostname() {
+    echo "请输入新主机名："
+    read hostname
+    sudo hostnamectl set-hostname $hostname
+    echo "主机名已更改为 $hostname"
+}
+
+# 19. 切换系统更新源
+change_update_source() {
+    sudo sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.aliyun.com/' /etc/apt/sources.list
+    sudo apt update
+    echo "系统更新源已切换为阿里云镜像"
+}
+
+# 主菜单
+while true; do
+    show_menu
+    echo "请输入你的选择 (1-19)："
+    read choice
+    case $choice in
+        1) set_shortcut ;;
+        2) change_password ;;
+        3) root_login ;;
+        4) install_python_version ;;
+        5) open_all_ports ;;
+        6) change_ssh_port ;;
+        7) optimize_dns ;;
+        8) reinstall_system ;;
+        9) disable_root_account ;;
+        10) switch_ip_protocol ;;
+        11) check_ports ;;
+        12) modify_swap_size ;;
+        13) user_management ;;
+        14) generate_user_pass ;;
+        15) adjust_timezone ;;
+        16) set_bbr3 ;;
+        17) firewall_manager ;;
+        18) change_hostname ;;
+        19) change_update_source ;;
+        *) echo "无效
+
+
 # 主菜单函数
 function show_menu() {
     clear
